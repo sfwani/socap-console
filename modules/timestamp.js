@@ -74,6 +74,7 @@ tsRef.innerHTML = `
     <li>Unix Epoch (ms): <code style="color: var(--ops-accent); font-family: 'Fira Code', monospace;">1708300800000</code></li>
     <li>ISO 8601: <code style="color: var(--ops-accent); font-family: 'Fira Code', monospace;">2025-02-19T12:00:00Z</code></li>
     <li>Common Log: <code style="color: var(--ops-accent); font-family: 'Fira Code', monospace;">19/Feb/2025:12:00:00</code></li>
+    <li>ITC Portal: <code style="color: var(--ops-accent); font-family: 'Fira Code', monospace;">20250219120000</code></li>
     <li>Most date strings parseable by JS Date()</li>
   </ul>
 `;
@@ -112,6 +113,14 @@ function parseTimestampInput(input) {
         return new Date(parseInt(input));
     }
 
+    // ITC Portal format: YYYYMMDDhhmmss (14 digits)
+    if (/^\d{14}$/.test(input)) {
+        const y = input.slice(0, 4), mo = input.slice(4, 6), da = input.slice(6, 8);
+        const h = input.slice(8, 10), mi = input.slice(10, 12), s = input.slice(12, 14);
+        const d = new Date(`${y}-${mo}-${da}T${h}:${mi}:${s}Z`);
+        if (!isNaN(d)) return d;
+    }
+
     // Common log format: 19/Feb/2025:12:00:00
     const clfMatch = input.match(/^(\d{2})\/(\w{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2})/);
     if (clfMatch) {
@@ -142,6 +151,26 @@ function convertTimestamp() {
 
     const etTzLabel = date.toLocaleTimeString('en-US', { timeZone: 'America/New_York', timeZoneName: 'short' }).split(' ').pop();
 
+    // ITC Portal format: YYYYMMDDhhmmss
+    const itcY = String(date.getUTCFullYear());
+    const itcMo = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const itcDa = String(date.getUTCDate()).padStart(2, '0');
+    const itcH = String(date.getUTCHours()).padStart(2, '0');
+    const itcMi = String(date.getUTCMinutes()).padStart(2, '0');
+    const itcS = String(date.getUTCSeconds()).padStart(2, '0');
+    const itcPortalValue = `${itcY}${itcMo}${itcDa}${itcH}${itcMi}${itcS}`;
+
+    // ITC Portal date-only range from CSV (start date + 000000, end date + 000000)
+    const csvState = window.csvParsedState || { times: [] };
+    let itcDateRange = itcPortalValue;
+    if (csvState.times.length > 0) {
+        const startDate = csvState.times[0].split(' ')[0].replace(/-/g, '');
+        const endDate = csvState.times[csvState.times.length - 1].split(' ')[0].replace(/-/g, '');
+        itcDateRange = startDate === endDate
+            ? `${startDate}000000`
+            : `${startDate}000000 - ${endDate}000000`;
+    }
+
     const formats = [
         { label: 'Unix Epoch (seconds)', value: Math.floor(date.getTime() / 1000).toString() },
         { label: 'Unix Epoch (milliseconds)', value: date.getTime().toString() },
@@ -149,6 +178,8 @@ function convertTimestamp() {
         { label: 'UTC String', value: date.toUTCString() },
         { label: `Eastern Time (${etTzLabel})`, value: date.toLocaleString('en-US', { timeZone: 'America/New_York', hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ` ${etTzLabel}` },
         { label: 'Local Time', value: date.toLocaleString() },
+        { label: 'ITC Portal', value: itcPortalValue },
+        { label: 'ITC Portal (CSV Date Range)', value: itcDateRange },
         { label: 'Date Only (UTC)', value: date.toISOString().split('T')[0] },
         { label: 'Time Only (UTC)', value: date.toISOString().split('T')[1].replace('Z', '') + ' UTC' },
         { label: 'Relative', value: getRelativeTime(date) }

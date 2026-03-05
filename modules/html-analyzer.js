@@ -8,7 +8,7 @@ analyzerTab.appendChild(haHeader);
 
 const haDesc = document.createElement('p');
 haDesc.className = 'tab-desc';
-haDesc.textContent = 'Paste raw HTML source code to extract links, external scripts/libraries, and flag potentially suspicious JavaScript patterns.';
+haDesc.textContent = 'Paste raw HTML source code or enter a URL to auto-fetch its source. Supports Wannabrowser links and direct URLs.';
 analyzerTab.appendChild(haDesc);
 
 // Two-column layout container
@@ -21,6 +21,66 @@ haContainer.style.alignItems = 'flex-start';
 const haLeftCol = document.createElement('div');
 haLeftCol.style.flex = '1';
 
+// URL Fetch section
+const urlFetchSection = document.createElement('div');
+urlFetchSection.className = 'ops-inset-panel';
+urlFetchSection.style.marginBottom = 'var(--sp-4)';
+urlFetchSection.style.padding = 'var(--sp-3) var(--sp-4)';
+
+const urlFetchLabel = document.createElement('label');
+urlFetchLabel.textContent = 'Fetch HTML from URL';
+urlFetchLabel.style.display = 'block';
+urlFetchLabel.style.marginBottom = 'var(--sp-2)';
+urlFetchSection.appendChild(urlFetchLabel);
+
+const urlFetchHint = document.createElement('div');
+urlFetchHint.style.fontSize = '11px';
+urlFetchHint.style.color = 'var(--ops-text-dim)';
+urlFetchHint.style.marginBottom = 'var(--sp-2)';
+urlFetchHint.textContent = 'Paste a Wannabrowser link (e.g. wannabrowser.net/#get=...) or any URL to fetch its HTML source.';
+urlFetchSection.appendChild(urlFetchHint);
+
+const urlInputRow = document.createElement('div');
+urlInputRow.style.display = 'flex';
+urlInputRow.style.gap = 'var(--sp-2)';
+
+const urlInput = document.createElement('input');
+urlInput.type = 'text';
+urlInput.id = 'htmlUrlInput';
+urlInput.placeholder = 'https://www.wannabrowser.net/#get=https://example.com or https://example.com';
+urlInput.style.flex = '1';
+urlInput.style.margin = '0';
+urlInputRow.appendChild(urlInput);
+
+const urlFetchBtn = document.createElement('button');
+urlFetchBtn.className = 'action-button';
+urlFetchBtn.textContent = 'Fetch';
+urlFetchBtn.style.flexShrink = '0';
+urlFetchBtn.style.padding = '0 var(--sp-4)';
+urlInputRow.appendChild(urlFetchBtn);
+
+urlFetchSection.appendChild(urlInputRow);
+
+// Status indicator
+const urlFetchStatus = document.createElement('div');
+urlFetchStatus.id = 'urlFetchStatus';
+urlFetchStatus.style.fontSize = '12px';
+urlFetchStatus.style.marginTop = 'var(--sp-2)';
+urlFetchStatus.style.display = 'none';
+urlFetchSection.appendChild(urlFetchStatus);
+
+haLeftCol.appendChild(urlFetchSection);
+
+// Divider with "OR" label
+const orDivider = document.createElement('div');
+orDivider.style.cssText = 'display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-3);';
+orDivider.innerHTML = `
+  <div style="flex: 1; height: 1px; background: var(--ops-border);"></div>
+  <span style="font-size: 11px; color: var(--ops-text-dim); text-transform: uppercase; letter-spacing: 0.08em;">or paste manually</span>
+  <div style="flex: 1; height: 1px; background: var(--ops-border);"></div>
+`;
+haLeftCol.appendChild(orDivider);
+
 const haInputLabel = document.createElement('label');
 haInputLabel.textContent = 'Raw HTML Input';
 haLeftCol.appendChild(haInputLabel);
@@ -28,7 +88,7 @@ haLeftCol.appendChild(haInputLabel);
 const htmlInput = document.createElement('textarea');
 htmlInput.id = 'htmlInput';
 htmlInput.placeholder = 'Paste HTML source code here...';
-htmlInput.style.height = '450px';
+htmlInput.style.height = '380px';
 haLeftCol.appendChild(htmlInput);
 
 const analyzeBtn = document.createElement('button');
@@ -37,6 +97,92 @@ analyzeBtn.textContent = 'Analyze Source';
 analyzeBtn.style.marginTop = 'var(--sp-2)';
 analyzeBtn.onclick = runAnalysis;
 haLeftCol.appendChild(analyzeBtn);
+
+// ---------- URL Fetch Logic ---------- //
+function extractTargetUrl(input) {
+    input = input.trim();
+    // Wannabrowser URL: extract the target URL from the hash
+    const wanMatch = input.match(/wannabrowser\.net\/#(?:get|url)=(.+)/i);
+    if (wanMatch) {
+        return decodeURIComponent(wanMatch[1]);
+    }
+    // Plain URL
+    if (input.startsWith('http://') || input.startsWith('https://')) {
+        return input;
+    }
+    // Try adding https://
+    if (input.includes('.') && !input.includes(' ')) {
+        return 'https://' + input;
+    }
+    return null;
+}
+
+async function fetchHtmlSource(targetUrl) {
+    urlFetchStatus.style.display = 'block';
+    urlFetchStatus.style.color = 'var(--intel-blue)';
+    urlFetchStatus.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Fetching source from ' + targetUrl.substring(0, 60) + (targetUrl.length > 60 ? '...' : '') + '</span>';
+
+    try {
+        // Use Wannabrowser API as a CORS-friendly proxy
+        const formData = new URLSearchParams();
+        formData.append('url', targetUrl);
+        formData.append('verb', 'get');
+        formData.append('ua', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        formData.append('referrer', '');
+
+        const response = await fetch('https://www.wannabrowser.net/api.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.body) {
+            // Decode HTML entities (the API returns HTML-encoded content)
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.body, 'text/html');
+            const decodedHtml = doc.documentElement.outerHTML;
+
+            htmlInput.value = decodedHtml;
+            urlFetchStatus.style.color = 'var(--threat-green)';
+            urlFetchStatus.textContent = '✓ Source code fetched successfully. Click "Analyze Source" to analyze.';
+            showToast('HTML source fetched', 'success');
+        } else {
+            throw new Error('No body content in response');
+        }
+    } catch (err) {
+        urlFetchStatus.style.color = 'var(--threat-red)';
+        const isCors = err.message.toLowerCase().includes('failed to fetch') || err.message.toLowerCase().includes('network');
+        if (isCors) {
+            urlFetchStatus.innerHTML = '✗ CORS blocked the request (running from <code style="font-size: 11px;">file://</code>).<br><span style="color: var(--ops-text-dim); font-size: 11px;">Fix: run <code>python3 -m http.server 8080</code> in the tool directory, then open <code>localhost:8080</code>. Or paste HTML manually below.</span>';
+        } else {
+            urlFetchStatus.textContent = '✗ Failed to fetch: ' + err.message + '. Try pasting the HTML manually.';
+        }
+        showToast('Failed to fetch URL', 'error');
+    }
+}
+
+urlFetchBtn.addEventListener('click', () => {
+    const targetUrl = extractTargetUrl(urlInput.value);
+    if (!targetUrl) {
+        urlFetchStatus.style.display = 'block';
+        urlFetchStatus.style.color = 'var(--threat-amber)';
+        urlFetchStatus.textContent = 'Please enter a valid URL.';
+        return;
+    }
+    fetchHtmlSource(targetUrl);
+});
+
+// Also fetch on Enter key
+urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        urlFetchBtn.click();
+    }
+});
 
 haContainer.appendChild(haLeftCol);
 

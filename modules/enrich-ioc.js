@@ -227,9 +227,9 @@ const regex_patterns = {
 
 // ---------- Source Categories ---------- //
 const sourceCategories = {
-  'Reputation & Intel': ['Recorded Future', 'VirusTotal', 'AbuseIPDB', 'CentralOps.net', 'AlienVault OTX', 'IBM X-Force', 'ThreatBook', 'Cisco Talos', 'GreyNoise', 'CrowdSec', 'Criminal IP', 'IOC Radar', 'ThreatFox', 'URLhaus', 'Maltiverse', 'Spur', 'VulDB', 'IPIntel.ai', 'IPThreat.net', 'CleanTalk', 'Cloudflare Radar', 'SecureFeed', 'Valkyrie Verdict', 'Symantec WebPulse'],
+  'Reputation & Intel': ['Recorded Future', 'VirusTotal', 'AbuseIPDB', 'CentralOps.net', 'AlienVault OTX', 'IBM X-Force', 'ThreatBook', 'Cisco Talos', 'GreyNoise', 'CrowdSec', 'Criminal IP', 'IOC Radar', 'ThreatFox', 'URLhaus', 'Maltiverse', 'Spur', 'VulDB', 'IPIntel.ai', 'IPThreat.net', 'CleanTalk', 'Cloudflare Radar', 'SecureFeed', 'Valkyrie Verdict', 'Symantec WebPulse', 'threatYeti'],
   'Scanning & Recon': ['urlscan.io (search)', 'urlscan.io (scan)', 'urlquery.net', 'Shodan', 'Censys', 'FOFA', 'Netlas.io', 'ONYPHE', 'BuiltWith', 'Netcraft', 'Netify', 'URLVoid', 'Sucuri SiteCheck', 'Whois.com', 'Validin', 'Wannabrowser', 'EveBox', 'Wayback Machine'],
-  'Sandboxes': ['Hybrid Analysis', 'ANY.RUN', 'Joe Sandbox', 'Triage', 'CAPE Sandbox', 'threatYeti', 'MalwareBazaar', 'YARAify', 'Kaspersky OpenTIP', 'VMRay Threat Feed', 'PolySwarm', 'Malprob', 'Threat.Zone', 'Neiki', 'MetaDefender', 'Intezer', 'Gridinsoft', 'Docguard', 'YOMI', 'ELF DIGEST', 'Kunai Sandbox', 'Koodous'],
+  'Sandboxes': ['Hybrid Analysis', 'ANY.RUN', 'Joe Sandbox', 'Triage', 'CAPE Sandbox', 'MalwareBazaar', 'YARAify', 'Kaspersky OpenTIP', 'VMRay Threat Feed', 'PolySwarm', 'Malprob', 'Threat.Zone', 'Neiki', 'MetaDefender', 'Intezer', 'Gridinsoft', 'Docguard', 'YOMI', 'ELF DIGEST', 'Kunai Sandbox', 'Koodous'],
   'Search Engines': ['GitHub', 'grep.app', 'Google', 'Bing']
 };
 
@@ -239,7 +239,41 @@ const enrichTab = document.getElementById("enrichTab");
 // Header
 const enrichHeader = document.createElement('h2');
 enrichHeader.textContent = 'Enrich IOC';
-enrichTab.prepend(enrichHeader);
+
+// Help (?) button
+const helpBtn = document.createElement('button');
+helpBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+helpBtn.style.cssText = 'background: transparent; border: none; color: var(--ops-text-dim); cursor: pointer; padding: 2px; margin-left: 8px; vertical-align: middle; position: relative; display: inline-flex; align-items: center; opacity: 0.6; transition: opacity 0.15s ease;';
+helpBtn.addEventListener('mouseenter', () => { helpBtn.style.opacity = '1'; });
+helpBtn.addEventListener('mouseleave', () => { helpBtn.style.opacity = '0.6'; });
+
+const helpTooltip = document.createElement('div');
+helpTooltip.style.cssText = 'display: none; position: absolute; top: 130%; left: -8px; z-index: 100; background: var(--ops-elevated); border: 1px solid var(--ops-border-med); border-radius: var(--radius-md); padding: 16px 20px; font-size: 12px; color: var(--ops-text-muted); width: 360px; line-height: 1.7; font-weight: 400; box-shadow: 0 8px 24px rgba(0,0,0,0.4);';
+helpTooltip.innerHTML = `
+<div style="font-size: 13px; font-weight: 600; color: var(--ops-text); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--intel-blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+  Allow Pop-ups for this Tab
+</div>
+<div style="font-size: 11.5px; color: var(--ops-text-dim); margin-bottom: 12px;">This tool opens multiple browser tabs at once. Your browser will block them by default. Enable pop-ups:</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Chrome</span><span>Click the blocked pop-up icon in the address bar → <em>Always allow</em></span></div>
+  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Firefox</span><span>Click <em>Options</em> on the yellow bar → <em>Allow pop-ups</em></span></div>
+  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Edge</span><span>Click the blocked pop-up icon → <em>Always allow</em></span></div>
+</div>`;
+helpBtn.appendChild(helpTooltip);
+helpBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  helpTooltip.style.display = helpTooltip.style.display === 'none' ? 'block' : 'none';
+});
+document.addEventListener('click', () => { helpTooltip.style.display = 'none'; });
+
+const headerWrapper = document.createElement('div');
+headerWrapper.style.display = 'flex';
+headerWrapper.style.alignItems = 'center';
+headerWrapper.style.marginBottom = 'var(--sp-1)';
+headerWrapper.appendChild(enrichHeader);
+headerWrapper.appendChild(helpBtn);
+enrichTab.prepend(headerWrapper);
 
 const enrichDesc = document.createElement('p');
 enrichDesc.className = 'tab-desc';
@@ -304,10 +338,8 @@ clearBtn.addEventListener('click', () => {
   document.querySelectorAll('#sourcesDiv .source-btn.selected').forEach(btn => btn.classList.remove('selected'));
 });
 
-actionRow.appendChild(selectAllBtn);
 actionRow.appendChild(deselectAllBtn);
 actionRow.appendChild(launchBtn);
-actionRow.appendChild(clearBtn);
 enrichTab.appendChild(actionRow);
 
 // Sources container

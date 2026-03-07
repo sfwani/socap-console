@@ -131,7 +131,9 @@ or RemoteIP == ip
 or DestinationIPAddress == ip
 or SourceIP == ip
 or DestinationIP == ip
-| where TimeGenerated between (start_time..end_time)`
+| where TimeGenerated between (start_time..end_time)
+| summarize count() by $table
+| sort by count_ desc`
       });
     });
   } else {
@@ -152,7 +154,9 @@ or RemoteIP == ip
 or DestinationIPAddress == ip
 or SourceIP == ip
 or DestinationIP == ip
-| where TimeGenerated between (start_time..end_time)`
+| where TimeGenerated between (start_time..end_time)
+| summarize count() by $table
+| sort by count_ desc`
     });
   }
 
@@ -306,21 +310,29 @@ ${buildOrWhere([
 | take 100`
   });
 
-  // --- Domain-Hunt (NEW) ---
+  // --- Domain-Hunt ---
   queries.push({
     title: `Domain-Hunt`,
-    query: `// Domain-Hunt: search for domain indicators across multiple tables
+    query: `// Domain --> Tables
 let domain = "${domain}";
 let start_time = datetime(${startTime}) - 15m;
 let end_time  = datetime(${endTime}) + 15m;
-search in (DeviceNetworkEvents, DeviceEvents, IdentityQueryEvents, EmailUrlInfo, UrlClickEvents)
-RemoteUrl has domain
-or Url has domain
-or QueryTarget has domain
+search in (DeviceNetworkEvents, DeviceProcessEvents, DeviceEvents, DeviceFileEvents, 
+DeviceImageLoadEvents, DeviceRegistryEvents, EmailUrlInfo, CloudAppEvents, 
+ThreatIntelIndicators, UrlClickEvents, IdentityQueryEvents)
+RemoteUrl contains domain
+or Url contains domain
+or UrlDomain contains domain
+or AdditionalFields contains domain
+or QueryTarget contains domain
+or DeviceName contains domain
+or ProcessCommandLine contains domain
+or InitiatingProcessCommandLine contains domain
+or RawEventData contains domain
+or Data contains domain
 | where TimeGenerated between (start_time..end_time)
-| project-reorder TimeGenerated, DeviceName, RemoteUrl, Url, QueryTarget, RemoteIP, ActionType, *
-| sort by TimeGenerated desc
-| take 200`
+| summarize count() by $table
+| sort by count_ desc`
   });
 
   // --- NetID → Tables ---
@@ -336,7 +348,8 @@ AccountUpn == net_id
 or AccountName == username
 or SourceUserName contains username
 | where TimeGenerated between (start_time..end_time)
-| summarize count() by $table`
+| summarize count() by $table
+| sort by count_ desc`
   });
 
   // --- SHA256-Hunt ---

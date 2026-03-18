@@ -117,7 +117,7 @@ const hash_links = {
   'CAPE Sandbox': 'https://capesandbox.com/analysis/search/?search=target_sha256%3A{ioc}',
   'PolySwarm': 'https://polyswarm.network/scan/results/file/{ioc}',
   'Malprob': 'https://malprob.io/report/{ioc}',
-  'Threat.Zone': 'https://app.threat.zone/submissions/public-submissions?page=1&jump=50&listOf=date&sort=asc&hash={ioc}',
+  'Threat.Zone': 'https://app.threat.zone/submissions/public-submissions?sha256={ioc}',
   'Neiki': 'https://threat.rip/file/{ioc}',
   'MetaDefender': 'https://metadefender.com/results/hash/{ioc}',
   'Intezer': 'https://analyze.intezer.com/files/{ioc}',

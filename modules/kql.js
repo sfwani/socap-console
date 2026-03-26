@@ -1,4 +1,6 @@
 // ---------- KQL Queries Tab ---------- //
+window.kqlFilterLogic = window.kqlFilterLogic || 'OR';
+
 const kqlTab = document.getElementById("kqlTab");
 
 // Header
@@ -53,6 +55,50 @@ kqlInputFields.forEach(f => {
   wrapper.appendChild(inp);
   kqlInputsContainer.appendChild(wrapper);
 });
+
+// AND / OR toggle
+const kqlLogicRow = document.createElement('div');
+kqlLogicRow.style.display = 'flex';
+kqlLogicRow.style.alignItems = 'center';
+kqlLogicRow.style.gap = 'var(--sp-2)';
+kqlLogicRow.style.width = '100%';
+kqlLogicRow.style.marginTop = 'var(--sp-3)';
+kqlLogicRow.style.paddingTop = 'var(--sp-3)';
+kqlLogicRow.style.borderTop = '1px solid var(--ops-border)';
+
+const kqlLogicLabel = document.createElement('span');
+kqlLogicLabel.textContent = 'Filter logic:';
+kqlLogicLabel.style.fontSize = '12px';
+kqlLogicLabel.style.color = 'var(--ops-text-muted)';
+kqlLogicRow.appendChild(kqlLogicLabel);
+
+['OR', 'AND'].forEach(op => {
+  const btn = document.createElement('button');
+  btn.textContent = op;
+  btn.dataset.op = op;
+  btn.className = 'action-button ' + (op === 'OR' ? 'primary' : 'secondary');
+  btn.style.padding = '3px 14px';
+  btn.style.fontSize = '12px';
+  btn.style.fontFamily = "'Fira Code', monospace";
+  btn.style.fontWeight = '600';
+  btn.addEventListener('click', () => {
+    window.kqlFilterLogic = op;
+    document.querySelectorAll('[data-op]').forEach(b => {
+      b.className = 'action-button ' + (b.dataset.op === op ? 'primary' : 'secondary');
+    });
+    renderAllQueries();
+  });
+  kqlLogicRow.appendChild(btn);
+});
+
+const kqlLogicHint = document.createElement('span');
+kqlLogicHint.id = 'kqlLogicHint';
+kqlLogicHint.style.fontSize = '11px';
+kqlLogicHint.style.color = 'var(--ops-text-dim)';
+kqlLogicHint.textContent = 'OR = match any filled field · AND = match all filled fields';
+kqlLogicRow.appendChild(kqlLogicHint);
+
+kqlInputsContainer.appendChild(kqlLogicRow);
 kqlTab.appendChild(kqlInputsContainer);
 
 // Queries container
@@ -107,7 +153,8 @@ function getKQLQueriesForTab() {
   function buildOrWhere(conditions) {
     const active = conditions.filter(c => c.active);
     if (active.length === 0) return '// ⚠️ No search variables provided — fill in at least one field above';
-    return '| where ' + active.map(c => c.clause).join('\nor ');
+    const op = (window.kqlFilterLogic === 'AND') ? '\nand ' : '\nor ';
+    return '| where ' + active.map(c => c.clause).join(op);
   }
 
   const queries = [];
@@ -449,7 +496,8 @@ function renderAllQueries() {
     copyBtn.onclick = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      copyToClipboard(q.query, copyBtn);
+      const ta = details.querySelector('textarea');
+      copyToClipboard(ta ? ta.value : q.query, copyBtn);
     };
 
     summary.appendChild(titleSpan);

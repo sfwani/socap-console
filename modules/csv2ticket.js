@@ -8,7 +8,7 @@ csvTab.appendChild(csvHeader);
 
 const csvDesc = document.createElement('p');
 csvDesc.className = 'tab-desc';
-csvDesc.textContent = 'Upload linkedAlerts CSV files to auto-generate investigation tickets. Supports multiple file merge.';
+csvDesc.textContent = 'Upload linkedAlerts or Stamus Networks CSV files to auto-generate investigation tickets. Supports multiple file merge.';
 csvTab.appendChild(csvDesc);
 
 // File input
@@ -29,7 +29,7 @@ csvTab.appendChild(ticketLabel);
 // Output Textarea
 const outputArea = document.createElement('textarea');
 outputArea.id = 'output';
-outputArea.placeholder = 'Upload a linkedAlerts CSV...';
+outputArea.placeholder = 'Upload a linkedAlerts or Stamus CSV...';
 csvTab.appendChild(outputArea);
 
 // Copy Button
@@ -171,7 +171,6 @@ fileInput.addEventListener("change", e => {
 function processCSV(text) {
   const rawRows = parseCSV(text);
   const headers = rawRows.shift();
-  const idx = name => headers.indexOf(name);
 
   const sets = {
     timestamps: new Set(), descriptions: new Set(), src_ips: new Set(), src_ports: new Set(),
@@ -180,60 +179,94 @@ function processCSV(text) {
     signature_ids: new Set(), payloads: new Set()
   };
 
+  // Detect format: Stamus exports have 'timestamp_utc' and 'alert.signature' as direct columns
+  const isStamus = headers.includes('timestamp_utc') && headers.includes('alert.signature');
+
   rawRows.forEach(r => {
     const row = {};
     headers.forEach((h, i) => row[h] = r[i] || '');
 
-    const event_json = row["event_json"] || "";
+    if (isStamus) {
+      // --- Stamus Networks CSV format ---
+      const ts = (row['timestamp_utc'] || '').replace(/\.\d+\s*UTC$/, '').replace(' UTC', '');
+      if (ts) sets.timestamps.add(ts);
+      if (row['src_ip']) sets.src_ips.add(row['src_ip']);
+      if (row['src_port']) sets.src_ports.add(row['src_port']);
+      if (row['dest_ip']) sets.dest_ips.add(row['dest_ip']);
+      if (row['dest_port']) sets.dest_ports.add(row['dest_port']);
+      if (row['direction']) sets.directions.add(row['direction']);
+      if (row['alert.signature']) sets.descriptions.add(row['alert.signature']);
+      if (row['alert.signature_id']) sets.signature_ids.add(row['alert.signature_id']);
+      if (row['payload_printable']) sets.payloads.add(row['payload_printable'].trim());
 
-    // regex extraction
-    for (const [k, rx] of Object.entries(patterns)) {
-      const m = event_json.match(rx);
-      if (!m) continue;
-      switch (k) {
-        case 'timestamp': sets.timestamps.add(m[1].replace("T", " ")); break;
-        case 'tls_subject': sets.tls_subjects.add(m[1]); break;
-        case 'tls_issuer': sets.tls_issuers.add(m[1]); break;
-        case 'app_proto':
-          const proto = (m[1] && (m[1].toLowerCase() === "failed" || m[1].toLowerCase() === "null")) ? "N/A" : m[1]?.toUpperCase();
-          sets.app_protos.add(proto);
-          break;
-        case 'direction': sets.directions.add(m[1]); break;
-        default: sets[k + 's']?.add(m[1]);
+      const ap = row['app_proto'] || '';
+      if (ap && ap.toLowerCase() !== 'unknown' && ap.toLowerCase() !== 'failed') {
+        sets.app_protos.add(ap.toUpperCase());
       }
+
+      const sni = row['tls.sni'];
+      if (sni) sets.domains.add(sni.replace(/\./g, '[.]'));
+      const host = row['hostname_info.host'];
+      if (host) sets.domains.add(host.replace(/\./g, '[.]'));
+      const url = row['hostname_info.url'];
+      if (url) sets.urls.add(url);
+
+      // TLS details still available in event_json
+      const ej = row['event_json'] || '';
+      const tls_s = ej.match(patterns.tls_subject);
+      if (tls_s) sets.tls_subjects.add(tls_s[1]);
+      const tls_i = ej.match(patterns.tls_issuer);
+      if (tls_i) sets.tls_issuers.add(tls_i[1]);
+
+    } else {
+      // --- linkedAlerts CSV format ---
+      const event_json = row["event_json"] || "";
+
+      for (const [k, rx] of Object.entries(patterns)) {
+        const m = event_json.match(rx);
+        if (!m) continue;
+        switch (k) {
+          case 'timestamp': sets.timestamps.add(m[1].replace("T", " ")); break;
+          case 'tls_subject': sets.tls_subjects.add(m[1]); break;
+          case 'tls_issuer': sets.tls_issuers.add(m[1]); break;
+          case 'app_proto':
+            const proto = (m[1] && (m[1].toLowerCase() === "failed" || m[1].toLowerCase() === "null")) ? "N/A" : m[1]?.toUpperCase();
+            sets.app_protos.add(proto);
+            break;
+          case 'direction': sets.directions.add(m[1]); break;
+          default: sets[k + 's']?.add(m[1]);
+        }
+      }
+
+      sets.descriptions.add(row["event_alertSignature"] || "");
+
+      let payload = (row["event_alertPayload"] || row["event_decoded_alertPayload"] || "").replace(/\s/g, '');
+      try {
+        const padLen = payload.length - (payload.length % 4);
+        payload = atob(payload.slice(0, padLen)).trim();
+      } catch (e) {
+        payload = (row["event_decoded_alertPayload"] || "").trim();
+      }
+      sets.payloads.add(payload);
+
+      const proto = row["event_app_Proto"] === "tls" ? "hxxps://" : "hxxp://";
+      const httpHostname = row["event_httpHostname"]?.replace(/\./g, '[.]');
+      const httpUrl = row["event_httpUrl"] || "";
+      const tlsSni = row["event_tlsSni"]?.replace(/\./g, '[.]');
+      const decodedPayload = row["event_decoded_alertPayload"] || "";
+      const hostname = decodedPayload.match(patterns.host_header);
+      const uri = decodedPayload.match(patterns.request_uri);
+
+      if (row["event_rrname_domain"]) sets.domains.add(row["event_rrname_domain"].replace(/\./g, '[.]'));
+      if (row["event_rrname_url"]) sets.urls.add(row["event_rrname_url"].replace(/\./g, '[.]'));
+      if (httpHostname !== "null") {
+        sets.domains.add(`${httpHostname}`);
+        if (httpUrl) { sets.urls.add(`${proto}${httpHostname}${httpUrl}`); }
+      }
+      if (tlsSni) { sets.domains.add(tlsSni); }
+      if (hostname) { sets.domains.add(hostname[1]?.replace(/\./g, '[.]')); }
+      if (uri) { sets.urls.add(`${proto}${hostname[1]?.replace(/\./g, '[.]')}${uri[1] || ''}`); }
     }
-
-    sets.descriptions.add(row["event_alertSignature"] || "");
-
-    // payload handling
-    let payload = (row["event_alertPayload"] || row["event_decoded_alertPayload"] || "").replace(/\s/g, '');
-    try {
-      const padLen = payload.length - (payload.length % 4);
-      payload = atob(payload.slice(0, padLen)).trim();
-    } catch (e) {
-      payload = (row["event_decoded_alertPayload"] || "").trim();
-    }
-    sets.payloads.add(payload);
-
-    // domains, urls
-    const proto = row["event_app_Proto"] === "tls" ? "hxxps://" : "hxxp://";
-    const httpHostname = row["event_httpHostname"]?.replace(/\./g, '[.]');
-    const httpUrl = row["event_httpUrl"] || "";
-    const tlsSni = row["event_tlsSni"]?.replace(/\./g, '[.]');
-    const decodedPayload = row["event_decoded_alertPayload"] || "";
-    const hostname = decodedPayload.match(patterns.host_header);
-    const uri = decodedPayload.match(patterns.request_uri);
-
-    if (row["event_rrname_domain"]) sets.domains.add(row["event_rrname_domain"].replace(/\./g, '[.]'));
-    if (row["event_rrname_url"]) sets.urls.add(row["event_rrname_url"].replace(/\./g, '[.]'));
-    if (httpHostname !== "null") {
-      sets.domains.add(`${httpHostname}`);
-      if (httpUrl) { sets.urls.add(`${proto}${httpHostname}${httpUrl}`); }
-    }
-    if (tlsSni) { sets.domains.add(tlsSni); }
-    if (hostname) { sets.domains.add(hostname[1]?.replace(/\./g, '[.]')); }
-    if (uri) { sets.urls.add(`${proto}${hostname[1]?.replace(/\./g, '[.]')}${uri[1] || ''}`); }
-
   });
 
   const times = [...sets.timestamps].sort();

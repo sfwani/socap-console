@@ -37,7 +37,7 @@ const urlFetchHint = document.createElement('div');
 urlFetchHint.style.fontSize = '11px';
 urlFetchHint.style.color = 'var(--ops-text-dim)';
 urlFetchHint.style.marginBottom = 'var(--sp-2)';
-urlFetchHint.textContent = 'Paste a Wannabrowser link (e.g. wannabrowser.net/#get=...) or any URL to fetch its HTML source.';
+urlFetchHint.textContent = 'Enter a URL to fetch its HTML. If CORS blocks the direct fetch, use "Open in Wannabrowser" — copy the Response Body there and paste it below.';
 urlFetchSection.appendChild(urlFetchHint);
 
 const urlInputRow = document.createElement('div');
@@ -47,7 +47,7 @@ urlInputRow.style.gap = 'var(--sp-2)';
 const urlInput = document.createElement('input');
 urlInput.type = 'text';
 urlInput.id = 'htmlUrlInput';
-urlInput.placeholder = 'https://www.wannabrowser.net/#get=https://example.com or https://example.com';
+urlInput.placeholder = 'https://example.com';
 urlInput.style.flex = '1';
 urlInput.style.margin = '0';
 urlInputRow.appendChild(urlInput);
@@ -58,6 +58,29 @@ urlFetchBtn.textContent = 'Fetch';
 urlFetchBtn.style.flexShrink = '0';
 urlFetchBtn.style.padding = '0 var(--sp-4)';
 urlInputRow.appendChild(urlFetchBtn);
+
+const wanBtn = document.createElement('button');
+wanBtn.className = 'action-button secondary';
+wanBtn.textContent = 'Open in Wannabrowser';
+wanBtn.style.flexShrink = '0';
+wanBtn.style.padding = '0 var(--sp-3)';
+wanBtn.title = 'Open URL in Wannabrowser — copy the Response Body and paste it below';
+wanBtn.addEventListener('click', () => {
+  const raw = urlInput.value.trim();
+  const targetUrl = extractTargetUrl(raw) || raw;
+  if (!targetUrl) {
+    urlFetchStatus.style.display = 'block';
+    urlFetchStatus.style.color = 'var(--threat-amber)';
+    urlFetchStatus.textContent = 'Enter a URL first.';
+    return;
+  }
+  const wanUrl = 'https://www.wannabrowser.net/#get=' + encodeURIComponent(targetUrl);
+  window.open(wanUrl, '_blank');
+  urlFetchStatus.style.display = 'block';
+  urlFetchStatus.style.color = 'var(--intel-blue)';
+  urlFetchStatus.innerHTML = 'ℹ Wannabrowser opened in a new tab. Copy the <strong>Response Body</strong> from there and paste it into the HTML input below, then click <strong>Analyze Source</strong>.';
+});
+urlInputRow.appendChild(wanBtn);
 
 urlFetchSection.appendChild(urlInputRow);
 
@@ -120,48 +143,23 @@ function extractTargetUrl(input) {
 async function fetchHtmlSource(targetUrl) {
     urlFetchStatus.style.display = 'block';
     urlFetchStatus.style.color = 'var(--intel-blue)';
-    urlFetchStatus.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Fetching source from ' + targetUrl.substring(0, 60) + (targetUrl.length > 60 ? '...' : '') + '</span>';
+    urlFetchStatus.innerHTML = '<span style="display: inline-flex; align-items: center; gap: 6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> Fetching ' + targetUrl.substring(0, 60) + (targetUrl.length > 60 ? '...' : '') + '</span>';
 
     try {
-        // Use Wannabrowser API as a CORS-friendly proxy
-        const formData = new URLSearchParams();
-        formData.append('url', targetUrl);
-        formData.append('verb', 'get');
-        formData.append('ua', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-        formData.append('referrer', '');
-
-        const response = await fetch('https://www.wannabrowser.net/api.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData.toString()
-        });
-
+        const response = await fetch(targetUrl, { signal: AbortSignal.timeout(8000) });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-
-        if (data.body) {
-            // Decode HTML entities (the API returns HTML-encoded content)
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.body, 'text/html');
-            const decodedHtml = doc.documentElement.outerHTML;
-
-            htmlInput.value = decodedHtml;
-            urlFetchStatus.style.color = 'var(--threat-green)';
-            urlFetchStatus.textContent = '✓ Source code fetched successfully. Click "Analyze Source" to analyze.';
-            showToast('HTML source fetched', 'success');
-        } else {
-            throw new Error('No body content in response');
-        }
+        const html = await response.text();
+        htmlInput.value = html;
+        urlFetchStatus.style.color = 'var(--threat-green)';
+        urlFetchStatus.textContent = '✓ Source fetched directly. Click "Analyze Source" to analyze.';
+        showToast('HTML source fetched', 'success');
     } catch (err) {
-        urlFetchStatus.style.color = 'var(--threat-red)';
-        const isCors = err.message.toLowerCase().includes('failed to fetch') || err.message.toLowerCase().includes('network');
-        if (isCors) {
-            urlFetchStatus.innerHTML = '✗ CORS blocked the request (running from <code style="font-size: 11px;">file://</code>).<br><span style="color: var(--ops-text-dim); font-size: 11px;">Fix: run <code>python3 -m http.server 8080</code> in the tool directory, then open <code>localhost:8080</code>. Or paste HTML manually below.</span>';
-        } else {
-            urlFetchStatus.textContent = '✗ Failed to fetch: ' + err.message + '. Try pasting the HTML manually.';
-        }
-        showToast('Failed to fetch URL', 'error');
+        // Direct fetch failed (CORS or network) — fall back to Wannabrowser
+        const wanUrl = 'https://www.wannabrowser.net/#get=' + encodeURIComponent(targetUrl);
+        window.open(wanUrl, '_blank');
+        urlFetchStatus.style.color = 'var(--intel-blue)';
+        urlFetchStatus.innerHTML = 'ℹ Direct fetch blocked — Wannabrowser opened in a new tab.<br><span style="color: var(--ops-text-muted); font-size: 11px;">Copy the <strong>Response Body</strong> from Wannabrowser and paste it into the HTML input below, then click <strong>Analyze Source</strong>.</span>';
+        showToast('Opened in Wannabrowser', 'info');
     }
 }
 

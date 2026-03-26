@@ -248,17 +248,38 @@ helpBtn.addEventListener('mouseenter', () => { helpBtn.style.opacity = '1'; });
 helpBtn.addEventListener('mouseleave', () => { helpBtn.style.opacity = '0.6'; });
 
 const helpTooltip = document.createElement('div');
-helpTooltip.style.cssText = 'display: none; position: absolute; top: 130%; left: -8px; z-index: 100; background: var(--ops-elevated); border: 1px solid var(--ops-border-med); border-radius: var(--radius-md); padding: 16px 20px; font-size: 12px; color: var(--ops-text-muted); width: 360px; line-height: 1.7; font-weight: 400; box-shadow: 0 8px 24px rgba(0,0,0,0.4);';
+helpTooltip.style.cssText = 'display: none; position: absolute; top: 130%; left: -8px; z-index: 100; background: var(--ops-elevated); border: 1px solid var(--ops-border-med); border-radius: var(--radius-md); padding: 16px 20px; font-size: 12px; color: var(--ops-text-muted); width: 420px; line-height: 1.7; font-weight: 400; box-shadow: 0 8px 24px rgba(0,0,0,0.4);';
 helpTooltip.innerHTML = `
 <div style="font-size: 13px; font-weight: 600; color: var(--ops-text); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--intel-blue)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-  Allow Pop-ups for this Tab
+  Allow Pop-ups &amp; Redirects
 </div>
-<div style="font-size: 11.5px; color: var(--ops-text-dim); margin-bottom: 12px;">This tool opens multiple browser tabs at once. Your browser will block them by default. Enable pop-ups:</div>
-<div style="display: flex; flex-direction: column; gap: 8px;">
-  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Chrome</span><span>Click the blocked pop-up icon in the address bar → <em>Always allow</em></span></div>
-  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Firefox</span><span>Click <em>Options</em> on the yellow bar → <em>Allow pop-ups</em></span></div>
-  <div style="display: flex; align-items: flex-start; gap: 8px;"><span style="font-weight: 600; color: var(--ops-text); min-width: 52px;">Edge</span><span>Click the blocked pop-up icon → <em>Always allow</em></span></div>
+<div style="font-size: 11.5px; color: var(--ops-text-dim); margin-bottom: 12px;">This tool opens multiple browser tabs at once. Add a pop-ups and redirects exception for <code style="font-size: 10.5px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">file:///&lt;path to socap-console&gt;/index.html</code></div>
+<div style="display: flex; flex-direction: column; gap: 10px; font-size: 11.5px;">
+  <div>
+    <span style="font-weight: 600; color: var(--ops-text);">Chrome</span>
+    <ol style="margin: 4px 0 0 0; padding-left: 18px; color: var(--ops-text-dim); line-height: 1.8;">
+      <li>Settings → Privacy and Security → Pop-ups and redirects</li>
+      <li>Add <code style="font-size: 10.5px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">file:///&lt;path&gt;/index.html</code> to the allowed list</li>
+    </ol>
+  </div>
+  <div>
+    <span style="font-weight: 600; color: var(--ops-text);">Edge</span>
+    <ol style="margin: 4px 0 0 0; padding-left: 18px; color: var(--ops-text-dim); line-height: 1.8;">
+      <li>Settings → Privacy, search, and services → Site permissions → All permissions → Pop-ups and redirects</li>
+      <li>Add <code style="font-size: 10.5px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">file:///&lt;path&gt;/index.html</code> to the allowed list</li>
+    </ol>
+  </div>
+  <div>
+    <span style="font-weight: 600; color: var(--ops-text);">Firefox</span>
+    <ol style="margin: 4px 0 0 0; padding-left: 18px; color: var(--ops-text-dim); line-height: 1.8;">
+      <li>Settings → Privacy &amp; Security → Manage pop-up and third-party redirect exceptions</li>
+      <li>Add <code style="font-size: 10.5px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">file:///&lt;path&gt;/index.html</code> to the allowed list</li>
+    </ol>
+  </div>
+  <div style="margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--ops-border); color: var(--ops-text-dim); font-size: 11px;">
+    <strong style="color: var(--ops-text-muted);">CORS note:</strong> Cross-Origin Request Blocked — The Same Origin Policy disallows reading the remote resource at <code style="font-size: 10px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">https://www.wannabrowser.net/api.php</code> (Reason: CORS header 'Access-Control-Allow-Origin' missing). Status code: 400.
+  </div>
 </div>`;
 helpBtn.appendChild(helpTooltip);
 helpBtn.addEventListener('click', (e) => {

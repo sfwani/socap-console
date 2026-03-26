@@ -277,9 +277,6 @@ helpTooltip.innerHTML = `
       <li>Add <code style="font-size: 10.5px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">file:///&lt;path&gt;/index.html</code> to the allowed list</li>
     </ol>
   </div>
-  <div style="margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--ops-border); color: var(--ops-text-dim); font-size: 11px;">
-    <strong style="color: var(--ops-text-muted);">CORS note:</strong> Cross-Origin Request Blocked — The Same Origin Policy disallows reading the remote resource at <code style="font-size: 10px; background: var(--ops-inset); padding: 1px 4px; border-radius: 3px;">https://www.wannabrowser.net/api.php</code> (Reason: CORS header 'Access-Control-Allow-Origin' missing). Status code: 400.
-  </div>
 </div>`;
 helpBtn.appendChild(helpTooltip);
 helpBtn.addEventListener('click', (e) => {

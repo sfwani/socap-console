@@ -158,10 +158,10 @@ function convertTimestamp() {
     const itcH = String(date.getUTCHours()).padStart(2, '0');
     const itcMi = String(date.getUTCMinutes()).padStart(2, '0');
     const itcS = String(date.getUTCSeconds()).padStart(2, '0');
-    const itcPortalValue = `${itcY}${itcMo}${itcDa}${itcH}${itcMi}00`;
+    const itcPortalValue = `${itcY}${itcMo}${itcDa}000000`;
 
     const dateEnd = new Date(date.getTime() + 86400000); // +1 day
-    const itcEndValue = `${dateEnd.getUTCFullYear()}${String(dateEnd.getUTCMonth()+1).padStart(2,'0')}${String(dateEnd.getUTCDate()).padStart(2,'0')}${String(dateEnd.getUTCHours()).padStart(2,'0')}${String(dateEnd.getUTCMinutes()).padStart(2,'0')}00`;
+    const itcEndValue = `${dateEnd.getUTCFullYear()}${String(dateEnd.getUTCMonth()+1).padStart(2,'0')}${String(dateEnd.getUTCDate()).padStart(2,'0')}000000`;
 
 
     const formats = [

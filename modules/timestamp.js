@@ -160,6 +160,9 @@ function convertTimestamp() {
     const itcS = String(date.getUTCSeconds()).padStart(2, '0');
     const itcPortalValue = `${itcY}${itcMo}${itcDa}${itcH}${itcMi}${itcS}`;
 
+    const dateEnd = new Date(date.getTime() + 86400000); // +1 day
+    const itcEndValue = `${dateEnd.getUTCFullYear()}${String(dateEnd.getUTCMonth()+1).padStart(2,'0')}${String(dateEnd.getUTCDate()).padStart(2,'0')}${String(dateEnd.getUTCHours()).padStart(2,'0')}${String(dateEnd.getUTCMinutes()).padStart(2,'0')}${String(dateEnd.getUTCSeconds()).padStart(2,'0')}`;
+
     // ITC Portal date-only range from CSV (start date + 000000, end date + 000000)
     const csvState = window.csvParsedState || { times: [] };
     let itcDateRange = itcPortalValue;
@@ -178,7 +181,8 @@ function convertTimestamp() {
         { label: 'UTC String', value: date.toUTCString() },
         { label: `Eastern Time (${etTzLabel})`, value: date.toLocaleString('en-US', { timeZone: 'America/New_York', hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ` ${etTzLabel}` },
         { label: 'Local Time', value: date.toLocaleString() },
-        { label: 'ITC Portal', value: itcPortalValue },
+        { label: 'ITC Portal Start', value: itcPortalValue },
+        { label: 'ITC Portal End (+1 day)', value: itcEndValue },
         { label: 'ITC Portal (CSV Date Range)', value: itcDateRange },
         { label: 'Date Only (UTC)', value: date.toISOString().split('T')[0] },
         { label: 'Time Only (UTC)', value: date.toISOString().split('T')[1].replace('Z', '') + ' UTC' },

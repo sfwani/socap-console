@@ -245,3 +245,12 @@ tsInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') convertTimestamp();
 });
 
+// Auto-populate from CSV start time when CSV is loaded
+window.refreshTimestampTab = function() {
+    const state = window.csvParsedState || { times: [] };
+    if (state.times.length > 0) {
+        tsInput.value = state.times[0];
+        convertTimestamp();
+    }
+};
+

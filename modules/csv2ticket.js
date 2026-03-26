@@ -377,7 +377,8 @@ ${noBreakingText([...sets.payloads].join("\n\n"))}
   // save state (shared with kql.js)
   window.csvParsedState.allIPs = [...sets.src_ips, ...sets.dest_ips];
   window.csvParsedState.times = times;
-  window.csvParsedState.domains = [...sets.domains];
+  // Store undefanged so KQL queries can use them directly
+  window.csvParsedState.domains = [...sets.domains].map(d => d.replace(/\[\.\]/g, '.'));
 
   // Render Signature ID buttons
   sigButtonContainer.innerHTML = '';
@@ -405,10 +406,8 @@ ${noBreakingText([...sets.payloads].join("\n\n"))}
     updateIntelStrip(window.csvParsedState.allIPs[0], 'IP');
   }
 
-  // Notify KQL tab if it has a refresh function
-  if (typeof window.refreshKQLTab === 'function') {
-    window.refreshKQLTab();
-  }
+  if (typeof window.refreshKQLTab === 'function') window.refreshKQLTab();
+  if (typeof window.refreshTimestampTab === 'function') window.refreshTimestampTab();
 }
 
 // ---------- Copy text ----------

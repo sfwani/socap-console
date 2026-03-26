@@ -131,7 +131,15 @@ function getKQLQueriesForTab() {
 
   const device_name = device_name_raw || "{device name}";
   const netid = netid_raw || "xxx@usf.edu";
-  const macs = macRaw ? macRaw.split(',').map(m => m.trim()).filter(x => x) : ["XX:XX:XX:XX:XX:XX", "XX-XX-XX-XX-XX-XX"];
+  function macToAllFormats(mac) {
+    const raw = mac.replace(/[:\-\s.]/g, '').toUpperCase();
+    if (raw.length !== 12 || !/^[0-9A-F]+$/.test(raw)) return [mac];
+    const p = raw.match(/.{2}/g);
+    return [p.join(':'), p.join('-'), raw];
+  }
+  const macs = macRaw
+    ? macRaw.split(',').map(m => m.trim()).filter(x => x).flatMap(macToAllFormats)
+    : ["XX:XX:XX:XX:XX:XX", "XX-XX-XX-XX-XX-XX", "XXXXXXXXXXXX"];
   const domain = extractedDomains.length ? extractedDomains[0] : "exampledomain1234x.com";
   const sha256s = shaRaw ? shaRaw.split(',').map(m => m.trim()).filter(x => x) : ["{sha256 hash(es)}"];
 

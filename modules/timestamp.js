@@ -165,14 +165,14 @@ function convertTimestamp() {
 
 
     const formats = [
-        { label: 'Unix Epoch (seconds)', value: Math.floor(date.getTime() / 1000).toString() },
-        { label: 'Unix Epoch (milliseconds)', value: date.getTime().toString() },
-        { label: 'ISO 8601 (UTC)', value: date.toISOString() },
-        { label: 'UTC String', value: date.toUTCString() },
-        { label: `Eastern Time (${etTzLabel})`, value: date.toLocaleString('en-US', { timeZone: 'America/New_York', hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ` ${etTzLabel}` },
-        { label: 'Local Time', value: date.toLocaleString() },
         { label: 'ITC Portal Start', value: itcPortalValue },
         { label: 'ITC Portal End (+1 day)', value: itcEndValue },
+        { label: 'ISO 8601 (UTC)', value: date.toISOString() },
+        { label: 'Local Time', value: date.toLocaleString() },
+        { label: 'UTC String', value: date.toUTCString() },
+        { label: `Eastern Time (${etTzLabel})`, value: date.toLocaleString('en-US', { timeZone: 'America/New_York', hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ` ${etTzLabel}` },
+        { label: 'Unix Epoch (seconds)', value: Math.floor(date.getTime() / 1000).toString() },
+        { label: 'Unix Epoch (milliseconds)', value: date.getTime().toString() },
         { label: 'Date Only (UTC)', value: date.toISOString().split('T')[0] },
         { label: 'Time Only (UTC)', value: date.toISOString().split('T')[1].replace('Z', '') + ' UTC' },
         { label: 'Relative', value: getRelativeTime(date) }

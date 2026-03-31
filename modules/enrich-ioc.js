@@ -42,7 +42,12 @@ const ip_links = {
   'GitHub': 'https://github.com/search?q={ioc}&type=code',
   'grep.app': 'https://grep.app/search?q={ioc}',
   'Google': 'https://www.google.com/search?q="{ioc}"',
-  'Bing': 'https://www.bing.com/search?q="{ioc}"'
+  'Bing': 'https://www.bing.com/search?q="{ioc}"',
+  'Gemini': 'https://www.google.com/search?udm=50&q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+blocklists,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.',
+  'ChatGPT': 'https://chatgpt.com/?q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Determine:+1.+Appearance+in+threat+feeds,+sandbox+reports,+or+blocklists+2.+Malware+families/Threat+actor+attribution+3.+Associated+Infrastructure/IPs/Domains.+4.+Reputation/Risk+Score+5.+Verdict+(Malicious/Benign)+Format+as+a+concise+Technical+Brief.',
+  'Mistral': 'https://chat.mistral.ai/chat?q=Search+the+web+to+conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search:+threat+feeds,+sandbox+reports,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.+Generate+a+detailed+threat+analysis+report.',
+  'Exa': 'https://exa.ai/search?q=Give+me+information+on+this+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+malware+families,+threat+actor+attribution,+associated+infrastructure/IPs/domains.&type=deep',
+  'Perplexity': 'https://www.perplexity.ai/search?q=Enrich+this+IOC:+"{ioc}"'
 };
 
 const domain_links = {
@@ -81,7 +86,12 @@ const domain_links = {
   'GitHub': 'https://github.com/search?q={ioc}&type=code',
   'grep.app': 'https://grep.app/search?q={ioc}',
   'Google': 'https://www.google.com/search?q="{ioc}"',
-  'Bing': 'https://www.bing.com/search?q="{ioc}"'
+  'Bing': 'https://www.bing.com/search?q="{ioc}"',
+  'Gemini': 'https://www.google.com/search?udm=50&q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+blocklists,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.',
+  'ChatGPT': 'https://chatgpt.com/?q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Determine:+1.+Appearance+in+threat+feeds,+sandbox+reports,+or+blocklists+2.+Malware+families/Threat+actor+attribution+3.+Associated+Infrastructure/IPs/Domains.+4.+Reputation/Risk+Score+5.+Verdict+(Malicious/Benign)+Format+as+a+concise+Technical+Brief.',
+  'Mistral': 'https://chat.mistral.ai/chat?q=Search+the+web+to+conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search:+threat+feeds,+sandbox+reports,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.+Generate+a+detailed+threat+analysis+report.',
+  'Exa': 'https://exa.ai/search?q=Give+me+information+on+this+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+malware+families,+threat+actor+attribution,+associated+infrastructure/IPs/domains.&type=deep',
+  'Perplexity': 'https://www.perplexity.ai/search?q=Enrich+this+IOC:+"{ioc}"'
 };
 
 const url_links = {
@@ -130,7 +140,12 @@ const hash_links = {
   'GitHub': 'https://github.com/search?q={ioc}&type=code',
   'grep.app': 'https://grep.app/search?q={ioc}',
   'Google': 'https://www.google.com/search?q="{ioc}"',
-  'Bing': 'https://www.bing.com/search?q="{ioc}"'
+  'Bing': 'https://www.bing.com/search?q="{ioc}"',
+  'Gemini': 'https://www.google.com/search?udm=50&q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+blocklists,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.',
+  'ChatGPT': 'https://chatgpt.com/?q=Conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Determine:+1.+Appearance+in+threat+feeds,+sandbox+reports,+or+blocklists+2.+Malware+families/Threat+actor+attribution+3.+Associated+Infrastructure/IPs/Domains.+4.+Reputation/Risk+Score+5.+Verdict+(Malicious/Benign)+Format+as+a+concise+Technical+Brief.',
+  'Mistral': 'https://chat.mistral.ai/chat?q=Search+the+web+to+conduct+a+thorough+threat+assessment+for+IOC:+"{ioc}".+Search:+threat+feeds,+sandbox+reports,+associated+malware+families/threat+actors,+associated+infrastucture,+and+reputation.+Generate+a+detailed+threat+analysis+report.',
+  'Exa': 'https://exa.ai/search?q=Give+me+information+on+this+IOC:+"{ioc}".+Search+threat+feeds,+sandbox+reports,+malware+families,+threat+actor+attribution,+associated+infrastructure/IPs/domains.&type=deep',
+  'Perplexity': 'https://www.perplexity.ai/search?q=Enrich+this+IOC:+"{ioc}"'
 };
 
 // ---------- Source icons ---------- //
@@ -202,7 +217,12 @@ const source_icons = {
   'YOMI': 'assets/yomi.ico',
   'ELF DIGEST': 'assets/elfdigest.ico',
   'Kunai Sandbox': 'assets/kunai.ico',
-  'Koodous': 'assets/koodous.ico'
+  'Koodous': 'assets/koodous.ico',
+  'Gemini': 'assets/gemini.ico',
+  'ChatGPT': 'assets/chatgpt.ico',
+  'Mistral': 'assets/mistral.ico',
+  'Exa': 'assets/exa.ico',
+  'Perplexity': 'assets/perplexity.ico',
 };
 
 // ---------- Defang substitutions ---------- //
@@ -230,7 +250,7 @@ const sourceCategories = {
   'Reputation & Intel': ['Recorded Future', 'VirusTotal', 'AbuseIPDB', 'CentralOps.net', 'AlienVault OTX', 'IBM X-Force', 'ThreatBook', 'Cisco Talos', 'GreyNoise', 'CrowdSec', 'Criminal IP', 'IOC Radar', 'ThreatFox', 'URLhaus', 'Maltiverse', 'Spur', 'VulDB', 'IPIntel.ai', 'IPThreat.net', 'CleanTalk', 'Cloudflare Radar', 'SecureFeed', 'Valkyrie Verdict', 'Symantec WebPulse', 'threatYeti'],
   'Scanning & Recon': ['urlscan.io (search)', 'urlscan.io (scan)', 'urlquery.net', 'Shodan', 'Censys', 'FOFA', 'Netlas.io', 'ONYPHE', 'BuiltWith', 'Netcraft', 'Netify', 'URLVoid', 'Sucuri SiteCheck', 'Whois.com', 'Validin', 'Wannabrowser', 'EveBox', 'Wayback Machine'],
   'Sandboxes': ['Hybrid Analysis', 'ANY.RUN', 'Joe Sandbox', 'Triage', 'CAPE Sandbox', 'MalwareBazaar', 'YARAify', 'Kaspersky OpenTIP', 'VMRay Threat Feed', 'PolySwarm', 'Malprob', 'Threat.Zone', 'Neiki', 'MetaDefender', 'Intezer', 'Gridinsoft', 'Docguard', 'YOMI', 'ELF DIGEST', 'Kunai Sandbox', 'Koodous'],
-  'Search Engines': ['GitHub', 'grep.app', 'Google', 'Bing']
+  'Search Engines': ['GitHub', 'grep.app', 'Google', 'Bing', 'Gemini', 'ChatGPT', 'Mistral', 'Exa', 'Perplexity'] 
 };
 
 // ---------- UI ---------- //

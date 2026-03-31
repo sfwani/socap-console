@@ -3,23 +3,20 @@
 - [x] add logic for stamus alert tickets (separate regex patterns and extraction based on named of .csv input)
 
 # KQL Queries Tab
-- [x] fix query textbox issue where edited text is not copied after selecting copy
 - [ ] fix queries 
-- [x] domain taken from the csv2ticket template should be in undefanged form
-- [x] input MAC address should be automatically converted to colon and dash format (no need to enter comma list)
+- [ ] fix issue where previously opened query textbox is not collapsed when a new csv is uploaded
 
 # Enrich IOC Tab
-- [x] fix the info dialog
-
-# HTML Analyzer Tab
-- [-] fix fetch error "CORS blocked the request (running from file://)."
+- [x] add llms/search engine sources
 
 # Time Convert Tab
-- [x] Start time should be taken from csv and used as default input
-- [x] give a date for the start date where hhmmss is 000000 and end date in the same format. Label them ITC Portal (Start) and ITC Portal (End) respectively
+- [x] put the ITC portal stuff at the top
+
+# HTML Analyzer Tab
+- [ ] fetch proxy (https://kennethscoggins.medium.com/how-to-make-a-fetch-proxy-in-javascript-to-avoid-cors-errors-with-apis-2b93c4ed0e78)
 
 # Accesibility 
-- [ ] keyboard shortcut feature
+- [ ] keyboard shortcut feature for tabs
 
 # Integrations
 - [ ] Zendesk

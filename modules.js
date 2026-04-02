@@ -1,6 +1,7 @@
 const modules = [
   { id: 'csvTab', title: 'CSV to Ticket', src: 'modules/csv2ticket.js', active: true },
   { id: 'kqlTab', title: 'KQL Queries', src: 'modules/kql.js' },
+  { id: 'dhcpTab', title: 'DHCP Lookup', src: 'modules/dhcp-lookup.js' },
   { id: 'enrichTab', title: 'Enrich IOC', src: 'modules/enrich-ioc.js' },
   { id: 'redactTab', title: 'Redact', src: 'modules/redact.js' },
   { id: 'h2cTab', title: 'Header to Curl', src: 'modules/h2c.js' },

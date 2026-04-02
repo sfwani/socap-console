@@ -190,12 +190,16 @@ function parseTimestampInput(input) {
 function convertTimestamp() {
     const input = tsInput.value;
     if (!input.trim()) {
+        window.timestampDerivedValues = {};
+        if (typeof window.refreshDhcpFromTimestamp === 'function') window.refreshDhcpFromTimestamp();
         tsResults.innerHTML = '<p style="color: var(--threat-amber); font-size: 13px;">Please enter a timestamp.</p>';
         return;
     }
 
     const date = parseTimestampInput(input);
     if (!date) {
+        window.timestampDerivedValues = {};
+        if (typeof window.refreshDhcpFromTimestamp === 'function') window.refreshDhcpFromTimestamp();
         tsResults.innerHTML = '<p style="color: var(--threat-red); font-size: 13px;">Could not parse timestamp. Try a different format.</p>';
         return;
     }
@@ -207,6 +211,12 @@ function convertTimestamp() {
 
     const dateEnd = new Date(date.getTime() + 86400000); // +1 day
     const itcEndValue = `${dateEnd.getFullYear()}${String(dateEnd.getMonth()+1).padStart(2,'0')}${String(dateEnd.getDate()).padStart(2,'0')}000000`;
+
+    window.timestampDerivedValues = {
+        itcPortalStart: itcPortalValue,
+        itcPortalEnd: itcEndValue
+    };
+    if (typeof window.refreshDhcpFromTimestamp === 'function') window.refreshDhcpFromTimestamp();
 
 
     const formats = [
@@ -291,4 +301,3 @@ window.refreshTimestampTab = function() {
         convertTimestamp();
     }
 };
-

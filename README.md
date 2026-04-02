@@ -4,6 +4,7 @@ A collection of tools and utilities to help with SOC ticket work.
 ## Tools
 - **CSV to Ticket:** Upload linkedAlerts CSV files to auto-generate investigation tickets. Supports multiple file merge.
 - **KQL Queries:** Pre-built KQL hunting queries auto-filled from the CSV data. All queries are expanded by default — click a title to collapse. Fill in additional fields below to refine.
+- **DHCP Lookup:** Submit a DHCP lease query to the ITC Portal in a new tab. Start Time and End Time auto-sync from the CSV.
 - **Enrich IOC:** Enter an IOC to query across multiple threat intelligence sources. Select sources and open them all at once.
 - **Redact:** Paste raw text/logs below. Auto-substitutes sensitive org information (IPs, emails, org names) with masked values. Add custom patterns below.
 - **Header to Curl:** Paste a raw HTTP request (from browser DevTools, Burp, etc.) to convert it into a curl command.

@@ -23,11 +23,18 @@ defangInput.placeholder = 'Paste IOCs here (one per line or comma-separated)...\
 defangInput.style.height = '150px';
 defangTab.appendChild(defangInput);
 
-// Button row
+// Direction toggle
 const dfBtnRow = document.createElement('div');
 dfBtnRow.style.display = 'flex';
 dfBtnRow.style.gap = 'var(--sp-2)';
 dfBtnRow.style.marginTop = 'var(--sp-2)';
+dfBtnRow.style.alignItems = 'center';
+
+const dfToggleLabel = document.createElement('span');
+dfToggleLabel.style.fontSize = '12px';
+dfToggleLabel.style.color = 'var(--ops-text-muted)';
+dfToggleLabel.textContent = 'Mode:';
+dfBtnRow.appendChild(dfToggleLabel);
 
 const defangBtn = document.createElement('button');
 defangBtn.textContent = 'Defang';
@@ -124,8 +131,16 @@ function runUndefang() {
 }
 
 // ---------- Events ---------- //
-defangBtn.addEventListener("click", runDefang);
-undefangBtn.addEventListener("click", runUndefang);
+defangBtn.addEventListener("click", () => {
+  defangBtn.className = 'action-button';
+  undefangBtn.className = 'action-button secondary';
+  runDefang();
+});
+undefangBtn.addEventListener("click", () => {
+  undefangBtn.className = 'action-button';
+  defangBtn.className = 'action-button secondary';
+  runUndefang();
+});
 defangInput.addEventListener("input", () => {
   if (dfLastDirection === 'refang') runUndefang(); else runDefang();
 });

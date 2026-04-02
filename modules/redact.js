@@ -31,18 +31,6 @@ redactInput.placeholder = 'Paste sensitive text here...';
 redactInput.style.height = '350px';
 rdLeftCol.appendChild(redactInput);
 
-const rdBtnRow = document.createElement('div');
-rdBtnRow.style.display = 'flex';
-rdBtnRow.style.gap = 'var(--sp-2)';
-rdBtnRow.style.marginTop = 'var(--sp-2)';
-
-const redactBtn = document.createElement('button');
-redactBtn.className = 'action-button';
-redactBtn.textContent = 'Redact';
-redactBtn.onclick = runRedact;
-rdBtnRow.appendChild(redactBtn);
-
-rdLeftCol.appendChild(rdBtnRow);
 rdContainer.appendChild(rdLeftCol);
 
 // Right Column: Output

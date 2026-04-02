@@ -22,13 +22,7 @@ iocTextSource.placeholder = 'Paste raw text here (emails, logs, reports) to extr
 iocTextSource.style.height = '180px';
 iocTab.appendChild(iocTextSource);
 
-// Action Button
-const extractBtn = document.createElement('button');
-extractBtn.className = 'action-button';
-extractBtn.textContent = 'Extract IOCs';
-extractBtn.onclick = () => extractIOCs(false);
 iocTextSource.addEventListener('input', () => extractIOCs(true));
-iocTab.appendChild(extractBtn);
 
 // Output Container (card-based)
 const iocOutputContainer = document.createElement('div');

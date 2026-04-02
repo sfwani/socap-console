@@ -23,14 +23,6 @@ h2cInput.placeholder = 'GET /path HTTP/1.1\nHost: example.com\nUser-Agent: Mozil
 h2cInput.style.height = '250px';
 h2cTab.appendChild(h2cInput);
 
-// Convert Button
-const convertBtn = document.createElement('button');
-convertBtn.className = 'action-button';
-convertBtn.textContent = 'Convert to Curl';
-convertBtn.style.marginTop = 'var(--sp-2)';
-convertBtn.onclick = runH2C;
-h2cTab.appendChild(convertBtn);
-
 // Output Card
 const h2cOutputCard = document.createElement('div');
 h2cOutputCard.className = 'ops-card';

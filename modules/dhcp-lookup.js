@@ -142,10 +142,19 @@ function openDhcpResults() {
     return;
   }
 
+  const targetName = 'socapDhcpResults';
+  const resultWindow = window.open('', targetName);
+
+  if (!resultWindow) {
+    dhcpStatus.style.color = 'var(--threat-red)';
+    dhcpStatus.textContent = 'Popup blocked. Allow popups for this page and try again.';
+    return;
+  }
+
   const form = document.createElement('form');
   form.method = 'POST';
   form.action = 'https://box.net.usf.edu/cgi-bin/dhcp/lease-query.pl';
-  form.target = '_blank';
+  form.target = targetName;
   form.style.display = 'none';
 
   Object.entries(values).forEach(([name, value]) => {

@@ -17,3 +17,6 @@ Thumbs.db
 
 # Gemini agent artifacts
 .gemini/
+
+# Codex Files
+.codex

@@ -88,9 +88,12 @@ const undefang_map = {
 };
 
 // ---------- Logic ---------- //
+let dfLastDirection = 'defang';
+
 function runDefang() {
+  dfLastDirection = 'defang';
   let text = defangInput.value;
-  if (!text) return;
+  if (!text) { defangOutput.value = ''; return; }
 
   // First undefang to prevent double defanging
   for (let key in undefang_map) {
@@ -105,12 +108,12 @@ function runDefang() {
   text = text.replace(/:/g, '[:]');
 
   defangOutput.value = text;
-  showToast('Defanged', 'success');
 }
 
 function runUndefang() {
+  dfLastDirection = 'refang';
   let text = defangInput.value;
-  if (!text) return;
+  if (!text) { defangOutput.value = ''; return; }
 
   for (let key in undefang_map) {
     const regex = new RegExp(key, "gi");
@@ -118,9 +121,11 @@ function runUndefang() {
   }
 
   defangOutput.value = text;
-  showToast('Refanged', 'success');
 }
 
 // ---------- Events ---------- //
 defangBtn.addEventListener("click", runDefang);
 undefangBtn.addEventListener("click", runUndefang);
+defangInput.addEventListener("input", () => {
+  if (dfLastDirection === 'refang') runUndefang(); else runDefang();
+});

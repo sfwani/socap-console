@@ -26,6 +26,7 @@ const modes = [
 ];
 
 let activeMode = 'base64';
+let encLastDirection = 'decode';
 
 modes.forEach(m => {
     const btn = document.createElement('button');
@@ -38,6 +39,7 @@ modes.forEach(m => {
             const b = document.getElementById('encMode_' + mm.id);
             b.className = mm.id === activeMode ? 'action-button' : 'action-button secondary';
         });
+        if (encInput.value) runEncode(encLastDirection);
     };
     modeRow.appendChild(btn);
 });
@@ -72,12 +74,12 @@ encBtnRow.style.marginTop = 'var(--sp-2)';
 const encodeBtn = document.createElement('button');
 encodeBtn.className = 'action-button';
 encodeBtn.textContent = 'Encode →';
-encodeBtn.onclick = () => runEncode('encode');
+encodeBtn.onclick = () => { encLastDirection = 'encode'; runEncode('encode'); };
 
 const decodeBtn = document.createElement('button');
 decodeBtn.className = 'action-button';
 decodeBtn.textContent = '← Decode';
-decodeBtn.onclick = () => runEncode('decode');
+decodeBtn.onclick = () => { encLastDirection = 'decode'; runEncode('decode'); };
 
 const chainBtn = document.createElement('button');
 chainBtn.className = 'action-button secondary';
@@ -228,3 +230,5 @@ function runChainDecode() {
         showToast('No encoding detected', 'info');
     }
 }
+
+encInput.addEventListener('input', () => runEncode(encLastDirection));

@@ -109,7 +109,7 @@ const replacements = [
 
 function runRedact() {
   let text = redactInput.value;
-  if (!text) return;
+  if (!text) { redactOutput.value = ''; return; }
 
   // Built-in replacements
   replacements.forEach(r => {
@@ -131,8 +131,10 @@ function runRedact() {
   }
 
   redactOutput.value = text;
-  showToast('Text redacted', 'success');
 }
+
+redactInput.addEventListener('input', runRedact);
+customInput.addEventListener('input', runRedact);
 
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

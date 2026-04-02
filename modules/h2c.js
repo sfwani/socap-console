@@ -106,7 +106,6 @@ function runH2C() {
   const requestLine = requestLineStr.match(/^([A-Z]+)\s+(.+?)\s+(HTTP\/\d(?:\.\d)?)$/i);
   if (!requestLine) {
     h2cOutput.value = "Error: Invalid Request Line.\nExpected format: GET /path HTTP/1.1";
-    showToast('Invalid request line', 'error');
     return;
   }
   const method = requestLine[1].toUpperCase();
@@ -133,7 +132,6 @@ function runH2C() {
     finalUrl = host.startsWith('http') ? `${host}${path}` : `${inferredScheme}${host}${path}`;
   } else {
     h2cOutput.value = "Error: No Host header found and path is not an absolute URL.";
-    showToast('Missing Host header', 'error');
     return;
   }
 
@@ -149,5 +147,6 @@ function runH2C() {
   }
 
   h2cOutput.value = curl;
-  showToast('Converted to curl', 'success');
 }
+
+h2cInput.addEventListener('input', runH2C);

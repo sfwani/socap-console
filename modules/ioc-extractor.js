@@ -26,7 +26,8 @@ iocTab.appendChild(iocTextSource);
 const extractBtn = document.createElement('button');
 extractBtn.className = 'action-button';
 extractBtn.textContent = 'Extract IOCs';
-extractBtn.onclick = extractIOCs;
+extractBtn.onclick = () => extractIOCs(false);
+iocTextSource.addEventListener('input', () => extractIOCs(true));
 iocTab.appendChild(extractBtn);
 
 // Output Container (card-based)
@@ -59,7 +60,7 @@ function cleanIOC(raw) {
     return raw.replace(/\[\.\]/g, '.').replace(/\[:\]/g, ':').replace(/hxxp/ig, 'http');
 }
 
-function extractIOCs() {
+function extractIOCs(silent = false) {
     const rawText = cleanIOC(iocTextSource.value);
     const results = {
         IPs: new Set(),
@@ -161,13 +162,15 @@ function extractIOCs() {
     });
 
     if (totalFound === 0) {
-        const empty = document.createElement('p');
-        empty.style.color = 'var(--ops-text-dim)';
-        empty.style.fontSize = '13px';
-        empty.textContent = 'No IOCs found in the input text.';
-        iocOutputContainer.appendChild(empty);
+        if (rawText.trim()) {
+            const empty = document.createElement('p');
+            empty.style.color = 'var(--ops-text-dim)';
+            empty.style.fontSize = '13px';
+            empty.textContent = 'No IOCs found in the input text.';
+            iocOutputContainer.appendChild(empty);
+        }
     } else {
-        showToast(`Extracted ${totalFound} IOC(s)`, 'success');
+        if (!silent) showToast(`Extracted ${totalFound} IOC(s)`, 'success');
 
         // Update Intel Strip with first IP found
         if (results.IPs.size > 0) {

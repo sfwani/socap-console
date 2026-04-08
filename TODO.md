@@ -3,22 +3,26 @@
 
 # KQL Queries Tab
 - [ ] fix queries 
-- [ ] fix issue where previously opened query textbox is not collapsed when a new csv is uploadeds
 - [ ] Add Source IP input field
+- [ ] Add start time and end time field 
+- [ ] add slider on top of each query text box to change the time window (+/-) for each query
 
 # DHCP Lookup Tab
 - [ ] After adding Source IP to the KQL tab, pull it from there and pre-fill the Start IP.
 
 # HTML Analyzer Tab
-- [ ] fetch proxy (https://kennethscoggins.medium.com/how-to-make-a-fetch-proxy-in-javascript-to-avoid-cors-errors-with-apis-2b93c4ed0e78)
+- [ ] make the categorization more intelligent (whitelisted/safe things in green, suspicious things in yellow, definitely malicious things in red)
+- [ ] add to list of malicious things to search for
+- [ ] provide the full line / function context of malicious items
+- [ ] maybe follow external JS if found
 
 # Accesibility 
 - [ ] keyboard shortcut feature for tabs
 - [ ] Add tooltips that display tab names when you hover over the tab (useful when the tab is short on width)
 
 # Integrations
-- [ ] Zendesk
-- [ ] Local model to understand zendesk past ticket context
+- [ ] Zendesk (pull and search similar solved tickets by ticket Description, remote IP, payload, or domain)
+- [ ] Local model to understand zendesk past ticket context (summarize findings of similar tickets: threat assessment/osint, affected users/devices)
 
 # Time Convert
-- [X] assume the input time is in UTC by default unless specified
+- [x] assume the input time is in UTC by default unless specified

@@ -30,6 +30,7 @@ csvTab.appendChild(ticketLabel);
 const outputArea = document.createElement('textarea');
 outputArea.id = 'output';
 outputArea.placeholder = 'Upload a linkedAlerts or Stamus CSV...';
+outputArea.style.height = '500px';
 csvTab.appendChild(outputArea);
 
 // Copy Button

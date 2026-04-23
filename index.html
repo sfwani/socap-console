@@ -762,6 +762,62 @@
       .main-content {
         margin-left: var(--sidebar-collapsed);
       }
+
+      /* Center logo when title is hidden */
+      .sidebar-header {
+        justify-content: center;
+        padding: var(--sp-4) var(--sp-2);
+      }
+
+      /* Reduce footer padding so theme toggle icon isn't squeezed */
+      .sidebar-footer {
+        padding: var(--sp-3) var(--sp-2);
+      }
+
+      .theme-toggle {
+        justify-content: center;
+        padding: var(--sp-2);
+      }
+
+      /* Allow tooltips to overflow the sidebar boundary */
+      .sidebar,
+      .sidebar-nav,
+      .sidebar-footer {
+        overflow: visible;
+      }
+
+      /* Tooltips — shared styles for nav buttons and theme toggle */
+      .sidebar-nav button,
+      .theme-toggle {
+        position: relative;
+      }
+
+      .sidebar-nav button[data-tooltip]::after,
+      .theme-toggle[data-tooltip]::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: calc(100% + 10px);
+        top: 50%;
+        transform: translateY(-50%) translateX(-4px);
+        background: var(--ops-elevated);
+        color: var(--ops-text);
+        border: 1px solid var(--ops-border-bold);
+        border-radius: var(--radius-md);
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease, transform 120ms ease;
+        z-index: 200;
+      }
+
+      .sidebar-nav button[data-tooltip]:hover::after,
+      .theme-toggle[data-tooltip]:hover::after {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
     }
 
     /* Scrollbar */
@@ -796,7 +852,7 @@
       <!-- Dynamic nav buttons injected here -->
     </div>
     <div class="sidebar-footer">
-      <button class="theme-toggle" id="themeToggleBtn">
+      <button class="theme-toggle" id="themeToggleBtn" data-tooltip="Toggle Light Mode">
         <span class="nav-icon">◑</span>
         <span class="theme-label">Toggle Light Mode</span>
       </button>
@@ -901,6 +957,7 @@
       label.textContent = mod.title;
       btn.appendChild(icon);
       btn.appendChild(label);
+      btn.dataset.tooltip = mod.title;
       btn.onclick = () => showTab(mod.id, btn);
       if (mod.active) btn.classList.add('active');
       tabsContainer.appendChild(btn);
@@ -930,7 +987,9 @@
     themeBtn.addEventListener('click', () => {
       document.body.classList.toggle('light-mode');
       const isLight = document.body.classList.contains('light-mode');
-      themeBtn.querySelector('.theme-label').textContent = isLight ? 'Toggle Dark Mode' : 'Toggle Light Mode';
+      const label = isLight ? 'Toggle Dark Mode' : 'Toggle Light Mode';
+      themeBtn.querySelector('.theme-label').textContent = label;
+      themeBtn.dataset.tooltip = label;
     });
 
     // ═══ Clock in Intel Strip ═══

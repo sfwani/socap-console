@@ -196,7 +196,7 @@ function processCSV(text) {
       if (row['direction']) sets.directions.add(row['direction']);
       if (row['alert.signature']) sets.descriptions.add(row['alert.signature']);
       if (row['alert.signature_id']) sets.signature_ids.add(row['alert.signature_id']);
-      if (row['payload_printable']) sets.payloads.add(row['payload_printable'].trim());
+      if (row['payload_printable']) sets.payloads.add(row['payload_printable'].replace(/\\n/g, '\n').trim());
 
       const ap = row['app_proto'] || '';
       if (ap && ap.toLowerCase() !== 'unknown' && ap.toLowerCase() !== 'failed') {

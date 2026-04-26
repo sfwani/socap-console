@@ -1,7 +1,7 @@
 # CSV2Ticket Tab (csv2ticket.js)
 - [ ] Add ticket template selection (socap event alert, defender ticket, etc.) 
-- [ ] some \n is not interpreted as newline in the payload_printable from stamus; must take from 'payload_printable' column not event_json
 - [ ] fix "Observed Domains/URLs" regex to not pull from payload or filter out IPS
+- [ ] sort supporting details by oldest to newest
 - [ ] simplify regex extraction logic to process less columns
 
 # KQL Queries Tab (kql.js)
